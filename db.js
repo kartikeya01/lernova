@@ -1,23 +1,24 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
-mongoose.connect("");
+mongoose.connect(process.env.MONGO_URL);
 const { Schema } = mongoose;
 const objectId = mongoose.Types.ObjectId;
 
-const userSchema = Schema({
+const userSchema = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
 });
 
-const adminSchema = Schema({
+const adminSchema = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
 });
 
-const courseSchema = Schema({
+const courseSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
@@ -25,7 +26,7 @@ const courseSchema = Schema({
   creatorId: { type: objectId, required: true },
 });
 
-const purchaseSchema = Schema({
+const purchaseSchema = new Schema({
   courseId: { type: objectId, required: true },
   userId: { type: objectId, required: true },
 });
