@@ -16,17 +16,18 @@ router.post("/signup", validate(userSignupSchema), async (req, res) => {
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     await userModel.create({
-      email: email,
+      email,
       password: encryptedPassword,
-      firstName: firstName,
-      lastName: lastName,
+      firstName,
+      lastName,
     });
-    res.status(200).json({
+
+    return res.status(200).json({
       message: "User signed up successfully!",
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({
+    return res.status(500).json({
       message: "User sign up failed.",
     });
   }
@@ -37,7 +38,7 @@ router.post("/signin", validate(userSigninSchema), async (req, res) => {
     const { email, password } = req.body;
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Sign up first." });
+      return res.status(401).json({ message: "Sign up as user first." });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -45,7 +46,7 @@ router.post("/signin", validate(userSigninSchema), async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    //generate jwt and send in response
+
     const token = jwt.sign(
       {
         email: user.email,
@@ -62,7 +63,9 @@ router.post("/signin", validate(userSigninSchema), async (req, res) => {
   }
 });
 
-router.get("/purchases", userAuth(jwt_secret), (req, res) => {
+router.use(userAuth(jwt_secret));
+
+router.get("/purchases", (req, res) => {
   res.json({
     message: "/user/purchases",
   });
