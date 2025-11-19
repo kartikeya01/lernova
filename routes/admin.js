@@ -1,32 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+const bcrypt = require("bcrypt");
+const { z } = require("zod");
+const { adminAuth } = require("../middlewares/auth");
 const { adminModel } = require("../db");
-const jwt_secret = process.env.JWT_SECRET;
 
-router.use(express.json());
-
-function adminMiddleware(req, res, next) {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).json({ error: "Token is missing." });
-  }
-  try {
-    const decoded = jwt.verify(token, jwt_secret);
-    if (decoded.role !== "admin") {
-      return res
-        .status(403)
-        .json({ error: "Not authorized! You are not admin" });
-    }
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ error: "Invalid token" });
-  }
-}
+require("dotenv").config();
 
 router.post("/signup", (req, res) => {
+  const { email, password, firstName, lastName } = req.body;
+
   res.json({
     message: "/admin/signup",
   });
@@ -38,7 +22,7 @@ router.post("/signin", (req, res) => {
   });
 });
 
-router.use(adminMiddleware);
+router.use(adminAuth);
 
 router.post("/course", (req, res) => {
   res.json({
